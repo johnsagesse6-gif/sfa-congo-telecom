@@ -1,0 +1,44 @@
+<form th:action="@{/factures/creer}" th:object="${factureDto}" method="post">
+    
+    <div class="mb-3">
+        <label class="form-label">Client :</label>
+        <select th:field="*{clientId}" class="form-select" required>
+            <option value="">-- Sélectionner le client --</option>
+            <option th:each="c : ${clients}" 
+                    th:value="${c.id}" 
+                    th:text="${c.raisonSociale}">
+            </option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Mode de Paiement :</label>
+        <select th:field="*{modePaiement}" class="form-select">
+            <option value="CASH">CASH</option>
+            <option value="AIRTEL_MONEY">AIRTEL MONEY</option>
+            <option value="ORANGE_MONEY">MOBILE MONEY</option>
+        </select>
+    </div>
+
+    <div class="card p-3 mb-3">
+        <h5>Articles</h5>
+        <div id="lignes-container">
+            <div class="row mb-2">
+                <div class="col">
+                    <select name="lignes[0].articleId" class="form-select" required>
+                        <option value="">-- Article --</option>
+                        <option th:each="a : ${articles}" 
+                                th:value="${a.id}" 
+                                th:text="${a.designation}">
+                        </option>
+                    </select>
+                </div>
+                <div class="col">
+                    <input type="number" name="lignes[0].quantite" class="form-control" value="1" min="1">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Générer la Facture</button>
+</form>
