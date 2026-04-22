@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+
+    <div th:replace="~{fragments/layout :: sidebar(currentPage='facture')}"></div>
+
+    <div class="main-content">
+        <div class="container d-flex align-items-center justify-content-center" style="min-height: 80vh;">
+            <div class="card card-custom p-5 text-center shadow-lg" style="max-width: 600px; border-top: 5px solid #00d4ff;">
+                
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill" style="font-size: 5rem; color: #198754;"></i>
+                </div>
+
+                <h2 class="fw-bold text-dark">Opération Réussie !</h2>
+                <p class="text-muted fs-5">La facture a été générée avec succès par le système <strong>CT-Guardian</strong>.</p>
+                
+                <hr class="my-4">
+
+                <div class="bg-light p-3 rounded mb-4 text-start">
+                    <p class="mb-1"><strong>Client :</strong> <span th:text="${clientNom}">Yoco Yoco</span></p>
+                    <p class="mb-1"><strong>Référence :</strong> <span th:text="${factureRef}">FAC-2026-001</span></p>
+                    <p class="mb-0"><strong>Statut :</strong> <span class="badge bg-success">Prêt pour impression</span></p>
+                </div>
+
+                <div class="d-grid gap-3 d-sm-flex justify-content-sm-center">
+                    <a th:href="@{/factures/telecharger/{id}(id=${factureId})}" class="btn btn-ct btn-lg px-4">
+                        <i class="bi bi-file-earmark-pdf-fill me-2"></i> Télécharger le PDF
+                    </a>
+                    
+                    <a th:href="@{/}" class="btn btn-outline-secondary btn-lg px-4">
+                        <i class="bi bi-house-door me-2"></i> Accueil
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+</body>
+</html>

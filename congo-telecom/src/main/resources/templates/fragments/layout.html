@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:fragment="head">
+    <meta charset="UTF-8">
+    <title>SFA - Congo Telecom</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <div th:fragment="sidebar" class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo-container">
+                <img th:src="@{/images/logo.jpeg}" alt="Logo Congo Telecom">
+            </div>
+            <div class="sys-title">CT-GUARDIAN SFA</div>
+            <div class="sys-subtitle">Système de Facturation par Agent</div>
+        </div>
+        <ul class="nav-links">
+            <li><a th:href="@{/}" th:class="${currentPage == 'index' ? 'active' : ''}">📄 Tableau de Bord</a></li>
+            <li><a th:href="@{/factures/creer}" th:class="${currentPage == 'facture' ? 'active' : ''}">➕ Nouvelle Facture</a></li>
+            <li><a th:href="@{/clients}" th:class="${currentPage == 'clients' ? 'active' : ''}">👥 Contacts Clients</a></li>
+            <li><a th:href="@{/articles}" th:class="${currentPage == 'articles' ? 'active' : ''}">💻 Catalogue Services</a></li>
+        </ul>
+    </div>
+</body>
+</html>

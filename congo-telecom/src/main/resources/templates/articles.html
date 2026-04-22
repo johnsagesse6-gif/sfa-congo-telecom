@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="card mb-4" style="border-top: 4px solid var(--ct-orange);">
+            <h5 class="fw-bold">AJOUTER UN SERVICE</h5>
+            <form th:action="@{/articles/ajouter}" method="post" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="codeArticle" class="form-control" placeholder="Code (ex: FIBRE-50M)" required>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" name="designation" class="form-control" placeholder="Désignation" required>
+                </div>
+                <div class="col-md-2">
+                    <input type="number" step="0.01" name="prixUnitaireHT" class="form-control" placeholder="Prix HT" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100" style="background-color: var(--ct-blue);">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="color: var(--ct-blue-dark);">CATALOGUE DES SERVICES</h2>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Code</th>
+                        <th>Désignation</th>
+                        <th>Prix Unitaire HT</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="a : ${articles}">
+                        <td th:text="${a.codeArticle}" style="color: var(--ct-blue); font-weight: bold;"></td>
+                        <td th:text="${a.designation}"></td>
+                        <td th:text="${#numbers.formatDecimal(a.prixUnitaireHT, 0, 'WHITESPACE', 0, 'POINT')} + ' FCFA'"></td>
+                        <td>
+                            <a th:href="@{/articles/supprimer/{id}(id=${a.id})}" 
+                               class="btn btn-sm btn-outline-danger" 
+                               onclick="return confirm('Supprimer ce service ?')">🗑️</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(articles)}">
+                        <td colspan="4" class="text-center text-muted">Le catalogue est vide.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

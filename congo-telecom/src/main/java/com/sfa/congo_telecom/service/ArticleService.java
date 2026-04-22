@@ -13,7 +13,22 @@ public class ArticleService {
         this.articleRepository = articleRepository;
     }
 
-    public List<Article> getAllArticles() {
+    // Utilisé par le ViewController
+    public List<Article> rechercherTous() {
         return articleRepository.findAll();
+    }
+
+    // AJOUTE CETTE MÉTHODE (Ligne 20 dans l'erreur)
+    public void sauvegarder(Article article) {
+        articleRepository.save(article);
+    }
+
+    // AJOUTE CETTE MÉTHODE (Ligne 26 dans l'erreur)
+    public void supprimer(Long id) {
+        articleRepository.deleteById(id);
+    }
+
+    public List<Article> getAllArticles() {
+        return rechercherTous();
     }
 }

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: sidebar}"></div>
+
+    <div class="main-content">
+        <div class="card mb-4">
+            <h5 class="fw-bold" style="color: var(--ct-blue);">+ ENREGISTRER UN NOUVEAU CLIENT</h5>
+            <form th:action="@{/clients/ajouter}" method="post" class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" name="numeroClient" class="form-control" placeholder="N° Client (ex: CT-242...)" required>
+                </div>
+                <div class="col-md-4">
+                    <input type="text" name="raisonSociale" class="form-control" placeholder="Nom ou Raison Sociale" required>
+                </div>
+                <div class="col-md-3">
+                    <input type="text" name="ville" class="form-control" placeholder="Ville (ex: Brazzaville)">
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-generate w-100">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card">
+            <h2 style="color: var(--ct-blue-dark);">CONTACTS CLIENTS</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>N° Client</th>
+                        <th>Raison Sociale</th>
+                        <th>Localisation</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="c : ${clients}">
+                        <td th:text="${c.numeroClient}" style="color: var(--ct-blue); font-weight: bold;"></td>
+                        <td th:text="${c.raisonSociale}"></td>
+                        <td th:text="${c.ville + (c.arrondissement != null ? ' - ' + c.arrondissement : '')}"></td>
+                        <td>
+                            <a th:href="@{/clients/supprimer/{id}(id=${c.id})}" 
+                               class="btn btn-sm" 
+                               onclick="return confirm('Supprimer ce client ?')"
+                               style="text-decoration: none;">❌</a>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(clients)}">
+                        <td colspan="4" style="text-align: center; padding: 20px; color: #999;">
+                            Aucun client enregistré.
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

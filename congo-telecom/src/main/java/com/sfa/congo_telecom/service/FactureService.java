@@ -27,17 +27,20 @@ public class FactureService {
         this.articleRepository = articleRepository;
     }
 
+    /**
+     * Crée une nouvelle facture à partir du DTO reçu du formulaire
+     */
     @Transactional
-    public Facture createFactureFromDTO(FactureRequestDTO dto) {
+    public Facture creerFacture(FactureRequestDTO dto) {
         Facture facture = new Facture();
         
-        // 1. Récupération du Client (YOCO YOCO)
+        // 1. Récupération du client
         Client client = clientRepository.findById(dto.getClientId())
                 .orElseThrow(() -> new RuntimeException("Client introuvable"));
         facture.setClient(client);
         facture.setModePaiement(dto.getModePaiement());
 
-        // 2. Transformation des LignesDTO en Lignes d'entité
+        // 2. Traitement des lignes de facture
         List<LigneFacture> lignesEntite = new ArrayList<>();
         double totalHT = 0;
 
@@ -58,15 +61,16 @@ public class FactureService {
         facture.setLignes(lignesEntite);
         facture.setTotalHT(totalHT);
 
-        // 3. Calcul des Taxes (Dynamique via la 7ème classe)
+        // 3. Calcul automatique des taxes (TVA, DA, TE)
         double cumuleTaxes = 0;
-        List<Taxe> taxesActives = taxeRepository.findAll(); // Ou findByActifTrue()
+        List<Taxe> taxesActives = taxeRepository.findAll(); 
 
         for (Taxe taxe : taxesActives) {
-            double montant = (taxe.getTypeTaxe().equalsIgnoreCase("POURCENTAGE")) 
+            double montant = (taxe.getTypeTaxe() != null && taxe.getTypeTaxe().equalsIgnoreCase("POURCENTAGE")) 
                              ? totalHT * (taxe.getValeur() / 100) 
                              : taxe.getValeur();
 
+            // Attribution aux colonnes spécifiques de la table Facture
             if ("TVA".equalsIgnoreCase(taxe.getLibelle())) facture.setMontantTVA(montant);
             else if ("DA".equalsIgnoreCase(taxe.getLibelle())) facture.setMontantDA(montant);
             else if ("TE".equalsIgnoreCase(taxe.getLibelle())) facture.setMontantTE(montant);
@@ -74,21 +78,46 @@ public class FactureService {
             cumuleTaxes += montant;
         }
 
+        // 4. Calcul final et métadonnées
         facture.setTotalTTC(totalHT + cumuleTaxes);
         facture.setNumeroFacture("FAC-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase());
-
-        // 4. Génération des données QR Code
+        
+        // Données pour le futur QR Code
         facture.setQrCodeData(String.format("CT-SFA|%s|%s|TTC:%.0f", 
                 facture.getNumeroFacture(), client.getRaisonSociale(), facture.getTotalTTC()));
 
         return factureRepository.save(facture);
     }
 
-    public List<Facture> getAllFactures() {
+    // --- MÉTHODES POUR LE DASHBOARD & VUES ---
+
+    /**
+     * Retourne la liste de toutes les factures
+     */
+    public List<Facture> rechercherTous() {
         return factureRepository.findAll();
     }
 
-    public Facture getFactureById(Long id) {
+    /**
+     * Recherche une facture spécifique pour le PDF
+     */
+    public Facture rechercherParId(Long id) {
         return factureRepository.findById(id).orElse(null);
+    }
+
+    /**
+     * Compte le nombre total de factures (Temps Réel)
+     */
+    public long compterToutes() {
+        return factureRepository.count();
+    }
+
+    /**
+     * Calcule la somme totale générée (Chiffre d'Affaires)
+     */
+    public double calculerChiffreAffaireTotal() {
+        return factureRepository.findAll().stream()
+                .mapToDouble(Facture::getTotalTTC)
+                .sum();
     }
 }

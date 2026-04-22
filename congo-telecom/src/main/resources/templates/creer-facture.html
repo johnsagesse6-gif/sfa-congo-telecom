@@ -1,44 +1,75 @@
-<form th:action="@{/factures/creer}" th:object="${factureDto}" method="post">
-    
-    <div class="mb-3">
-        <label class="form-label">Client :</label>
-        <select th:field="*{clientId}" class="form-select" required>
-            <option value="">-- Sélectionner le client --</option>
-            <option th:each="c : ${clients}" 
-                    th:value="${c.id}" 
-                    th:text="${c.raisonSociale}">
-            </option>
-        </select>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Mode de Paiement :</label>
-        <select th:field="*{modePaiement}" class="form-select">
-            <option value="CASH">CASH</option>
-            <option value="AIRTEL_MONEY">AIRTEL MONEY</option>
-            <option value="ORANGE_MONEY">MOBILE MONEY</option>
-        </select>
-    </div>
-
-    <div class="card p-3 mb-3">
-        <h5>Articles</h5>
-        <div id="lignes-container">
-            <div class="row mb-2">
-                <div class="col">
-                    <select name="lignes[0].articleId" class="form-select" required>
-                        <option value="">-- Article --</option>
-                        <option th:each="a : ${articles}" 
-                                th:value="${a.id}" 
-                                th:text="${a.designation}">
-                        </option>
-                    </select>
-                </div>
-                <div class="col">
-                    <input type="number" name="lignes[0].quantite" class="form-control" value="1" min="1">
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head}"></head>
+<body>
+    <div th:replace="~{fragments/layout :: sidebar(currentPage='facture')}"></div>
+    <div class="main-content">
+        <h2 class="fw-bold mb-4">Émettre une Facture</h2>
+        
+        <form th:action="@{/factures/creer}" th:object="${factureDto}" method="post">
+            <div class="card card-custom p-4 mb-4">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Client</label>
+                        <select th:field="*{clientId}" class="form-select" required>
+                            <option value="">Choisir un client...</option>
+                            <option th:each="c : ${clients}" th:value="${c.id}" th:text="${c.raisonSociale}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-bold">Paiement</label>
+                        <select th:field="*{modePaiement}" class="form-select">
+                            <option value="CASH">Espèces</option>
+                            <option value="AIRTEL_MONEY">Airtel Money</option>
+                        </select>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <div class="card card-custom p-4">
+                <div class="d-flex justify-content-between mb-3">
+                    <h5 class="fw-bold">Services & Articles</h5>
+                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="ajouterLigne()"><i class="bi bi-plus"></i> Ajouter</button>
+                </div>
+                <div id="lignes-container">
+                    <div class="row g-2 mb-2 p-2 bg-light rounded align-items-end">
+                        <div class="col-md-8">
+                            <select name="lignes[0].articleId" class="form-select" required>
+                                <option th:each="a : ${articles}" th:value="${a.id}" th:text="${a.designation + ' (' + a.prixUnitaireHT + ' FCFA)'}"></option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="number" name="lignes[0].quantite" class="form-control" value="1" min="1">
+                        </div>
+                        <div class="col-md-1">
+                            <button type="button" class="btn btn-outline-danger w-100" disabled><i class="bi bi-trash"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-4">
+                <button type="submit" class="btn btn-lg px-5 shadow" style="background: #00d4ff; font-weight: bold;">GÉNÉRER LE PDF</button>
+            </div>
+        </form>
     </div>
 
-    <button type="submit" class="btn btn-primary">Générer la Facture</button>
-</form>
+    <script th:src="@{/js/bootstrap.bundle.min.js}"></script>
+    <script>
+        let index = 1;
+        function ajouterLigne() {
+            const container = document.getElementById('lignes-container');
+            const clone = container.firstElementChild.cloneNode(true);
+            clone.querySelectorAll('select, input').forEach(el => {
+                el.name = el.name.replace('[0]', '[' + index + ']');
+                if(el.tagName === 'INPUT') el.value = 1;
+            });
+            const btn = clone.querySelector('button');
+            btn.disabled = false;
+            btn.onclick = function() { this.closest('.row').remove(); };
+            container.appendChild(clone);
+            index++;
+        }
+    </script>
+</body>
+</html>

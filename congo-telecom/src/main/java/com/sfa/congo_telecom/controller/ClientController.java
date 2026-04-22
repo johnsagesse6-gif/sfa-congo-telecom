@@ -2,12 +2,11 @@ package com.sfa.congo_telecom.controller;
 
 import com.sfa.congo_telecom.model.Client;
 import com.sfa.congo_telecom.service.ClientService;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
-@RestController
-@RequestMapping("/api/clients")
-@CrossOrigin("*")
+@Controller
+@RequestMapping("/clients")
 public class ClientController {
 
     private final ClientService clientService;
@@ -16,19 +15,15 @@ public class ClientController {
         this.clientService = clientService;
     }
 
-    @GetMapping
-    public List<Client> list() {
-        return clientService.getAllClients();
+    @PostMapping("/ajouter")
+    public String ajouter(@ModelAttribute Client client) {
+        clientService.saveClient(client);
+        return "redirect:/clients";
     }
 
-    @PostMapping
-    public Client save(@RequestBody Client client) {
-        return clientService.saveClient(client);
-    }
-
-    @GetMapping("/search")
-    public Client findByNum(@RequestParam String numeroClient) {
-        return clientService.findByNumeroClient(numeroClient)
-                .orElseThrow(() -> new RuntimeException("Client non trouvé"));
+    @GetMapping("/supprimer/{id}")
+    public String supprimer(@PathVariable Long id) {
+        clientService.deleteClient(id);
+        return "redirect:/clients";
     }
 }
